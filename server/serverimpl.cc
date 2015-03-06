@@ -41,7 +41,7 @@ static bool check_exist_parent(ServerDB db, const std::string path) {
 	return true;
 }
 
-std::unique_ptr<bool>
+std::unique_ptr<Result>
 api_v1_server::create(std::unique_ptr<kvpair> arg)
 {
   bool hasKey;
