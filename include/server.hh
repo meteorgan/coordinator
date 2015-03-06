@@ -35,10 +35,12 @@ template<> struct xdr_traits<::kvpair>
 }
 
 enum ServerError : std::uint32_t {
+  NONE,
   KEY_NOT_FOUND,
   NO_PARENT,
   HAS_CHILDREN,
   MALFORMED_KEY,
+  DUPLICATE_KEY,
 };
 namespace xdr {
 template<> struct xdr_traits<::ServerError>
@@ -47,6 +49,8 @@ template<> struct xdr_traits<::ServerError>
   static constexpr bool is_numeric = false;
   static const char *enum_name(::ServerError val) {
     switch (val) {
+    case ::NONE:
+      return "NONE";
     case ::KEY_NOT_FOUND:
       return "KEY_NOT_FOUND";
     case ::NO_PARENT:
@@ -55,6 +59,8 @@ template<> struct xdr_traits<::ServerError>
       return "HAS_CHILDREN";
     case ::MALFORMED_KEY:
       return "MALFORMED_KEY";
+    case ::DUPLICATE_KEY:
+      return "DUPLICATE_KEY";
     default:
       return nullptr;
     }

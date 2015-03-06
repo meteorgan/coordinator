@@ -40,11 +40,32 @@ static bool check_exist_parent(ServerDB db, const std::string path) {
 std::unique_ptr<Result>
 api_v1_server::create(std::unique_ptr<kvpair> arg)
 {
-  std::unique_ptr<Result> res(new Result);
+	std::unique_ptr<Result> res(new Result);
+	std::string key = arg->key;
+	std::string value = arg->val;
   
-  // Fill in function body here
+	if(check_valid_path(key)) {
+		if(db.hasKey(key)) {
+			res->error_ = ServerError::DUPLICATE_KEY;
+			std::cerr << "duplicate key: " << key << std::endl;
+		}
+		else {
+			if(check_exist_parent(db, key)) {
+				res->error_ = ServerError::NO_PARENT;
+				std::cerr << "key: " << " has no parent!" << std::endl;
+			}
+			else {
+				db.set(key, value);
+				std::cout << "add key: " << key << " with value: " << value << std::endl;
+			}
+		}
+	}
+	else {
+		res->error_ = ServerError::MALFORMED_KEY;
+		std::cerr << "malformed key: "<< key << std::endl;
+	}
   
-  return res;
+	return res;
 }
 
 std::unique_ptr<Result>

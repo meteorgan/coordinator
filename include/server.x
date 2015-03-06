@@ -7,10 +7,12 @@ struct kvpair {
 };
 
 enum ServerError {
+	NONE,
 	KEY_NOT_FOUND,
 	NO_PARENT,
 	HAS_CHILDREN,
-	MALFORMED_KEY
+	MALFORMED_KEY,
+	DUPLICATE_KEY
 };
 
 union Result switch(unsigned discriminant) {
