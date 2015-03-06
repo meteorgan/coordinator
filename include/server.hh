@@ -3,7 +3,7 @@
 // DO NOT EDIT or your changes may be overwritten
 
 #ifndef __XDR_INCLUDE_SERVER_HH_INCLUDED__
-#define __XDR_INCLUDE_SERVER_HH_INCLUDED__ 1
+#define __XDR_INCLUDE_SERVER_HH_INCLUDED__
 
 #include <xdrpp/types.h>
 
