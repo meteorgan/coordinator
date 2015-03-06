@@ -3,7 +3,7 @@
 // DO NOT EDIT or your changes may be overwritten
 
 #ifndef __XDR_INCLUDE_SERVER_HH_INCLUDED__
-#define __XDR_INCLUDE_SERVER_HH_INCLUDED__
+#define __XDR_INCLUDE_SERVER_HH_INCLUDED__ 1
 
 #include <xdrpp/types.h>
 
@@ -34,6 +34,194 @@ template<> struct xdr_traits<::kvpair>
 };
 }
 
+enum ServerError : std::uint32_t {
+  KEY_NOT_FOUND,
+  NO_PARENT,
+  HAS_CHILDREN,
+  MALFORMED_KEY,
+};
+namespace xdr {
+template<> struct xdr_traits<::ServerError>
+  : xdr_integral_base<::ServerError, std::uint32_t> {
+  static constexpr bool is_enum = true;
+  static constexpr bool is_numeric = false;
+  static const char *enum_name(::ServerError val) {
+    switch (val) {
+    case ::KEY_NOT_FOUND:
+      return "KEY_NOT_FOUND";
+    case ::NO_PARENT:
+      return "NO_PARENT";
+    case ::HAS_CHILDREN:
+      return "HAS_CHILDREN";
+    case ::MALFORMED_KEY:
+      return "MALFORMED_KEY";
+    default:
+      return nullptr;
+    }
+  }
+};
+}
+
+struct Result {
+private:
+  std::uint32_t discriminant_;
+  union {
+    xdr::xstring<> val_;
+    xdr::xvector<longstring> key_;
+    ServerError error_;
+  };
+
+public:
+  static_assert (sizeof (unsigned) <= 4, "union discriminant must be 4 bytes");
+
+  static constexpr int _xdr_field_number(std::uint32_t which) {
+    return which == 1 ? 1
+      : which == 2 ? 2
+      : 3;
+  }
+  template<typename _F, typename...A> static bool
+  _xdr_with_mem_ptr(_F &_f, std::uint32_t which, A&&...a) {
+    switch (which) {
+    case 1:
+      _f(&Result::val_, std::forward<A>(a)...);
+      return true;
+    case 2:
+      _f(&Result::key_, std::forward<A>(a)...);
+      return true;
+    default:
+      _f(&Result::error_, std::forward<A>(a)...);
+      return true;
+    }
+  }
+
+  std::uint32_t _xdr_discriminant() const { return discriminant_; }
+  void _xdr_discriminant(std::uint32_t which, bool validate = true) {
+    int fnum = _xdr_field_number(which);
+    if (fnum < 0 && validate)
+      throw xdr::xdr_bad_discriminant("bad value of discriminant in Result");
+    if (fnum != _xdr_field_number(discriminant_)) {
+      this->~Result();
+      discriminant_ = which;
+      _xdr_with_mem_ptr(xdr::field_constructor, discriminant_, *this);
+    }
+  }
+  Result(std::uint32_t which = std::uint32_t{}) : discriminant_(which) {
+    _xdr_with_mem_ptr(xdr::field_constructor, discriminant_, *this);
+  }
+  Result(const Result &source) : discriminant_(source.discriminant_) {
+    _xdr_with_mem_ptr(xdr::field_constructor, discriminant_, *this, source);
+  }
+  Result(Result &&source) : discriminant_(source.discriminant_) {
+    _xdr_with_mem_ptr(xdr::field_constructor, discriminant_, *this,
+                      std::move(source));
+  }
+  ~Result() { _xdr_with_mem_ptr(xdr::field_destructor, discriminant_, *this); }
+  Result &operator=(const Result &source) {
+    if (_xdr_field_number(discriminant_) 
+        == _xdr_field_number(source.discriminant_))
+      _xdr_with_mem_ptr(xdr::field_assigner, discriminant_, *this, source);
+    else {
+      this->~Result();
+      discriminant_ = std::uint32_t(-1);
+      _xdr_with_mem_ptr(xdr::field_constructor, discriminant_, *this, source);
+    }
+    discriminant_ = source.discriminant_;
+    return *this;
+  }
+  Result &operator=(Result &&source) {
+    if (_xdr_field_number(discriminant_)
+         == _xdr_field_number(source.discriminant_))
+      _xdr_with_mem_ptr(xdr::field_assigner, discriminant_, *this,
+                        std::move(source));
+    else {
+      this->~Result();
+      discriminant_ = std::uint32_t(-1);
+      _xdr_with_mem_ptr(xdr::field_constructor, discriminant_, *this,
+                        std::move(source));
+    }
+    discriminant_ = source.discriminant_;
+    return *this;
+  }
+
+  std::uint32_t discriminant() const { return std::uint32_t(discriminant_); }
+  Result &discriminant(unsigned _xdr_d, bool _xdr_validate = true) {
+    _xdr_discriminant(_xdr_d, _xdr_validate);
+    return *this;
+  }
+
+  xdr::xstring<> &val() {
+    if (_xdr_field_number(discriminant_) == 1)
+      return val_;
+    throw xdr::xdr_wrong_union("Result: val accessed when not selected");
+  }
+  const xdr::xstring<> &val() const {
+    if (_xdr_field_number(discriminant_) == 1)
+      return val_;
+    throw xdr::xdr_wrong_union("Result: val accessed when not selected");
+  }
+  xdr::xvector<longstring> &key() {
+    if (_xdr_field_number(discriminant_) == 2)
+      return key_;
+    throw xdr::xdr_wrong_union("Result: key accessed when not selected");
+  }
+  const xdr::xvector<longstring> &key() const {
+    if (_xdr_field_number(discriminant_) == 2)
+      return key_;
+    throw xdr::xdr_wrong_union("Result: key accessed when not selected");
+  }
+  ServerError &error() {
+    if (_xdr_field_number(discriminant_) == 3)
+      return error_;
+    throw xdr::xdr_wrong_union("Result: error accessed when not selected");
+  }
+  const ServerError &error() const {
+    if (_xdr_field_number(discriminant_) == 3)
+      return error_;
+    throw xdr::xdr_wrong_union("Result: error accessed when not selected");
+  }
+};
+namespace xdr {
+template<> struct xdr_traits<::Result> : xdr_traits_base {
+  static constexpr bool is_class = true;
+  static constexpr bool is_union = true;
+  static constexpr bool has_fixed_size = false;
+
+  using union_type = ::Result;
+  using discriminant_type = decltype(std::declval<union_type>().discriminant());
+
+  static constexpr const char *union_field_name(std::uint32_t which) {
+    return which == 1 ? "val"
+      : which == 2 ? "key"
+      : "error";
+  }
+  static const char *union_field_name(const union_type &u) {
+    return union_field_name(u._xdr_discriminant());
+  }
+
+  static std::size_t serial_size(const ::Result &obj) {
+    std::size_t size = 0;
+    if (!obj._xdr_with_mem_ptr(field_size, obj._xdr_discriminant(), obj, size))
+      throw xdr_bad_discriminant("bad value of discriminant in Result");
+    return size + 4;
+  }
+  template<typename Archive> static void
+  save(Archive &ar, const ::Result &obj) {
+    xdr::archive(ar, obj.discriminant(), "discriminant");
+    if (!obj._xdr_with_mem_ptr(field_archiver, obj.discriminant(), ar, obj,
+                               union_field_name(obj)))
+      throw xdr_bad_discriminant("bad value of discriminant in Result");
+  }
+  template<typename Archive> static void
+  load(Archive &ar, ::Result &obj) {
+    discriminant_type which;
+    xdr::archive(ar, which, "discriminant");
+    obj.discriminant(which);
+    obj._xdr_with_mem_ptr(field_archiver, obj.discriminant(), ar, obj,
+                          union_field_name(which));
+  }
+};
+}
+
 struct api_v1 {
   static constexpr std::uint32_t program = 1074036870;
   static constexpr const char *program_name = "server_api";
@@ -46,8 +234,8 @@ struct api_v1 {
     static constexpr const char *proc_name = "create";
     using arg_type = kvpair;
     using arg_wire_type = kvpair;
-    using res_type = bool;
-    using res_wire_type = bool;
+    using res_type = Result;
+    using res_wire_type = Result;
     
     template<typename C, typename...A> static auto
     dispatch(C &&c, A &&...a) ->
@@ -68,8 +256,8 @@ struct api_v1 {
     static constexpr const char *proc_name = "remove";
     using arg_type = longstring;
     using arg_wire_type = longstring;
-    using res_type = bool;
-    using res_wire_type = bool;
+    using res_type = Result;
+    using res_wire_type = Result;
     
     template<typename C, typename...A> static auto
     dispatch(C &&c, A &&...a) ->
@@ -90,8 +278,8 @@ struct api_v1 {
     static constexpr const char *proc_name = "set";
     using arg_type = kvpair;
     using arg_wire_type = kvpair;
-    using res_type = bool;
-    using res_wire_type = bool;
+    using res_type = Result;
+    using res_wire_type = Result;
     
     template<typename C, typename...A> static auto
     dispatch(C &&c, A &&...a) ->
