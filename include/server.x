@@ -18,7 +18,7 @@ union Result switch(unsigned discriminant) {
 		string val<>;
 	case 2:
 		longstring key<>;
-	case 3:
+	default:
 		ServerError error;
 };
 
