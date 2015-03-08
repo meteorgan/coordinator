@@ -6,7 +6,6 @@
 #include <thread>
 
 #include <xdrpp/srpc.h>
-#include <xdrpp/rpcbind.hh>
 #include <xdrpp/socket.h>
 
 #include "include/rpcconfig.h"
@@ -30,4 +29,3 @@ int main(int argc, const char *argv[])
 
     return 0;
 }
-

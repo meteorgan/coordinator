@@ -58,13 +58,25 @@ bool
 Client::create(const std::string &path, const std::string &val)
 {
     kvpair args;
-
     args.key = path;
     args.val = val;
 
-    auto r = client->create(args);
+    std::unique_ptr<Result> r = client->create(args);
+    switch(r->error()) {
+    case ServerError::KEY_DUPLICATE:
+    	throw ClientException{ClientError::DUPLICATE_KEY};
+    	break;
+    case ServerError::KEY_MALFORMED:
+    	throw ClientException{ClientError::MALFORMED_KEY};
+    	break;
+    case ServerError::KEY_NO_PARENT:
+    	throw ClientException{ClientError::NO_PARENT};
+    	break;
+    default:
+    	return true;
+    }
 
-    return *r;
+    return false;
 }
 
 bool

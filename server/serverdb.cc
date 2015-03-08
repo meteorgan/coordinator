@@ -185,7 +185,7 @@ int
 main(int argc, const char *argv[])
 {
     ServerDB s("test.db");
-
+    cout << s.hasKey("/gan") << endl;
     s.set("/test", "myval");
     s.get("/test");
     s.set("/test", "newval");
@@ -196,7 +196,8 @@ main(int argc, const char *argv[])
     for (auto it = lst.begin(); it != lst.end(); it++) {
         cout << "LIST: " << (*it) << endl;
     }
-    if (s.hasKey("/bob"))
+
+    if (!s.hasKey("/bob"))
         cout << "Good 'bob' not present" << endl;
 }
 

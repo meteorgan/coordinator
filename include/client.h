@@ -22,6 +22,10 @@ enum ClientError {
      * The key path violates our formatting rules
      */
     MALFORMED_KEY,
+	/*
+	 * they had persisted so can't set again
+	 */
+	DUPLICATE_KEY,
 };
 
 /*
@@ -42,6 +46,8 @@ public:
                 return "HAS CHILDREN";
             case MALFORMED_KEY:
                 return "MALFORMED KEY";
+            case DUPLICATE_KEY:
+            	return "DUPLICATE_KEY";
         }
         return "UNKNOWN ERROR CODE";
     }

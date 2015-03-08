@@ -1,4 +1,3 @@
-
 typedef string longstring<>;
 
 struct kvpair {
@@ -8,11 +7,11 @@ struct kvpair {
 
 enum ServerError {
 	NONE,
-	KEY_NOT_FOUND,
-	NO_PARENT,
-	HAS_CHILDREN,
-	MALFORMED_KEY,
-	DUPLICATE_KEY
+	KEY_NOT_FOUND_ERROR,
+	KEY_NO_PARENT,
+	KEY_HAS_CHILDREN,
+	KEY_MALFORMED,
+	KEY_DUPLICATE
 };
 
 union Result switch(unsigned discriminant) {
