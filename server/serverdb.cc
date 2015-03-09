@@ -20,6 +20,9 @@ int
 dirDepth(const string &path)
 {
     int depth = 0;
+    if(path == "/") {
+    	return depth;
+    }
 
     for (auto it = path.begin(); it != path.end(); it++) {
         if ((*it) == '/')
@@ -96,8 +99,14 @@ ServerDB::list(const string &path)
 {
     int depth = dirDepth(path) + 1;
     std::set<string> r;
+
+    std::string p = path;
+    if(!path.compare("/")) {
+    	p = "";
+    }
+
     SQLStmt s(db, "SELECT key FROM kvpair WHERE key LIKE '%s/%%' AND depth = %d",
-            path.c_str(), depth);
+            p.c_str(), depth);
 
     s.step();
     while (s.row()) {

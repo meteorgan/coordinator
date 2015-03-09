@@ -12,7 +12,7 @@ class api_v1_server {
 public:
   using rpc_interface_type = api_v1;
 
-  api_v1_server() : db("kvstore.db") {};
+  api_v1_server();
   ~api_v1_server() {};
 
   std::unique_ptr<Result> create(std::unique_ptr<kvpair> arg);

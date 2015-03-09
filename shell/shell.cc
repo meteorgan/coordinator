@@ -56,6 +56,9 @@ Cmd_Create(int argc, const char *argv[])
     try {
         if (client.create(argv[1], argv[2]))
             cout << "CREATED" << endl;
+        else {
+        	cout << "KEY ALREADY EXISTS" << endl;
+        }
     } catch (ClientException &e) {
         cout << e.what() << endl;
     }

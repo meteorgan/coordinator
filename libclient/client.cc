@@ -64,7 +64,7 @@ Client::create(const std::string &path, const std::string &val)
     std::unique_ptr<Result> r = client->create(args);
     switch(r->error()) {
     case ServerError::KEY_DUPLICATE:
-    	throw ClientException{ClientError::DUPLICATE_KEY};
+    	return false;
     	break;
     case ServerError::KEY_MALFORMED:
     	throw ClientException{ClientError::MALFORMED_KEY};
@@ -84,7 +84,13 @@ Client::get(const std::string &path)
 {
     std::unique_ptr<Result> result = client->get(path);
     if(result->discriminant() != 1) {
-    	throw ClientException{ClientError::KEY_NOT_FOUND};
+    	switch(result->error()) {
+    	case ServerError::KEY_NOT_FOUND_ERROR:
+    		throw ClientException{ClientError::KEY_NOT_FOUND};
+    		break;
+    	case ServerError::KEY_MALFORMED:
+    		throw ClientException{ClientError::MALFORMED_KEY};
+    	}
     }
     else {
     	return result->val();
@@ -98,8 +104,13 @@ Client::set(const std::string &path, const std::string &val)
 	arg.key = path;
 	arg.val = val;
     std::unique_ptr<Result> result = client->set(arg);
-    if(result->error() == ServerError::KEY_NOT_FOUND_ERROR) {
+    switch(result->error()) {
+    case ServerError::KEY_NOT_FOUND_ERROR:
     	throw ClientException{ClientError::KEY_NOT_FOUND};
+    	break;
+    case ServerError::KEY_MALFORMED:
+    	throw ClientException{ClientError::MALFORMED_KEY};
+    	break;
     }
 }
 
@@ -114,6 +125,8 @@ Client::remove(const std::string &path)
 	case ServerError::KEY_NOT_FOUND_ERROR:
 		throw ClientException{ClientError::KEY_NOT_FOUND};
 		break;
+	case ServerError::KEY_MALFORMED:
+		throw ClientException{ClientError::MALFORMED_KEY};
 	default:
 		return true;
 	}
@@ -132,7 +145,14 @@ Client::list(const string &path)
     	}
     }
     else {
-    	throw ClientException{ClientError::KEY_NOT_FOUND};
+    	switch(result->error()) {
+    	case ServerError::KEY_MALFORMED:
+    		throw ClientException{ClientError::MALFORMED_KEY};
+    		break;
+    	case ServerError::KEY_NOT_FOUND_ERROR:
+    		throw ClientException{ClientError::KEY_NOT_FOUND};
+    		break;
+    	}
     }
 
     return r;
