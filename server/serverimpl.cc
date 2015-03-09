@@ -2,6 +2,8 @@
 // Edit to add functionality.
 
 #include<iostream>
+#include<set>
+
 #include "server/serverimpl.hh"
 
 static bool check_valid_path(const std::string& path) {
@@ -137,10 +139,29 @@ api_v1_server::remove(std::unique_ptr<longstring> arg)
 	return res;
 }
 
+static std::string getSubDir(const std::string& path) {
+	int pos = path.rfind("/");
+	return path.substr(pos+1);
+}
+
 std::unique_ptr<Result>
 api_v1_server::list(std::unique_ptr<longstring> arg) {
 	std::unique_ptr<Result> res(new Result);
 	std::string& path = *arg;
+	if(db.hasKey(path)) {
+		std::set<std::string> subKeys = db.list(path);
+		res->discriminant(2);
+		for(auto &key : subKeys) {
+			std::string subPath = getSubDir(key);
+			res->keys().push_back(subPath);
+		}
+		std::cout << "list key: " << path << "'s subKey" << std::endl;
+	}
+	else {
+		res->discriminant(3);
+		res->error() = ServerError::KEY_NOT_FOUND_ERROR;
+		std::cout << "key: " << path << " not found." << std::endl;
+	}
 
 	return res;
 }

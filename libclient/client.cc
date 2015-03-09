@@ -125,6 +125,15 @@ std::set<string>
 Client::list(const string &path)
 {
     std::set<string> r;
-    // TODO: Fill me in
+    std::unique_ptr<Result> result = client->list(path);
+    if(result->discriminant() == 2) {
+    	for(auto &key : result->keys()) {
+    		r.insert(key);
+    	}
+    }
+    else {
+    	throw ClientException{ClientError::KEY_NOT_FOUND};
+    }
+
     return r;
 }
