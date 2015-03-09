@@ -18,7 +18,7 @@ union Result switch(unsigned discriminant) {
 	case 1:
 		string val<>;
 	case 2:
-		longstring key<>;
+		longstring keys<>;
 	default:
 		ServerError error;
 };
@@ -28,6 +28,7 @@ program server_api {
 	Result create(kvpair) = 1;
 	Result remove(longstring) = 2;
 	Result set(kvpair) = 3;
-    // TODO: Fill me in
+	Result get(longstring) = 4;
+	Result list(longstring) = 5;
   } = 1;
 } = 0x40048086;

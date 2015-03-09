@@ -56,8 +56,6 @@ Cmd_Create(int argc, const char *argv[])
     try {
         if (client.create(argv[1], argv[2]))
             cout << "CREATED" << endl;
-        else
-            cout << "KEY ALREADY EXISTS" << endl;
     } catch (ClientException &e) {
         cout << e.what() << endl;
     }
@@ -91,6 +89,7 @@ Cmd_Set(int argc, const char *argv[])
 
     try {
         client.set(argv[1], argv[2]);
+        cout << "SET" << endl;
     } catch (ClientException &e) {
         cout << e.what() << endl;
     }

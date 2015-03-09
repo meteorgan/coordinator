@@ -79,24 +79,35 @@ Client::create(const std::string &path, const std::string &val)
     return false;
 }
 
-bool
-Client::remove(const std::string &path)
-{
-    // TODO: Fill me in
-    return false;
-}
-
 std::string
 Client::get(const std::string &path)
 {
-    // TODO: Fill me in
-    return "";
+    std::unique_ptr<Result> result = client->get(path);
+    if(result->discriminant() != 1) {
+    	throw ClientException{ClientError::KEY_NOT_FOUND};
+    }
+    else {
+    	return result->val();
+    }
 }
 
 void
 Client::set(const std::string &path, const std::string &val)
 {
+	kvpair arg;
+	arg.key = path;
+	arg.val = val;
+    std::unique_ptr<Result> result = client->set(arg);
+    if(result->error() == ServerError::KEY_NOT_FOUND_ERROR) {
+    	throw ClientException{ClientError::KEY_NOT_FOUND};
+    }
+}
+
+bool
+Client::remove(const std::string &path)
+{
     // TODO: Fill me in
+    return false;
 }
 
 std::set<string>
@@ -106,4 +117,3 @@ Client::list(const string &path)
     // TODO: Fill me in
     return r;
 }
-

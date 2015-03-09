@@ -73,7 +73,7 @@ private:
   std::uint32_t discriminant_;
   union {
     xdr::xstring<> val_;
-    xdr::xvector<longstring> key_;
+    xdr::xvector<longstring> keys_;
     ServerError error_;
   };
 
@@ -92,7 +92,7 @@ public:
       _f(&Result::val_, std::forward<A>(a)...);
       return true;
     case 2:
-      _f(&Result::key_, std::forward<A>(a)...);
+      _f(&Result::keys_, std::forward<A>(a)...);
       return true;
     default:
       _f(&Result::error_, std::forward<A>(a)...);
@@ -165,15 +165,15 @@ public:
       return val_;
     throw xdr::xdr_wrong_union("Result: val accessed when not selected");
   }
-  xdr::xvector<longstring> &key() {
+  xdr::xvector<longstring> &keys() {
     if (_xdr_field_number(discriminant_) == 2)
-      return key_;
-    throw xdr::xdr_wrong_union("Result: key accessed when not selected");
+      return keys_;
+    throw xdr::xdr_wrong_union("Result: keys accessed when not selected");
   }
-  const xdr::xvector<longstring> &key() const {
+  const xdr::xvector<longstring> &keys() const {
     if (_xdr_field_number(discriminant_) == 2)
-      return key_;
-    throw xdr::xdr_wrong_union("Result: key accessed when not selected");
+      return keys_;
+    throw xdr::xdr_wrong_union("Result: keys accessed when not selected");
   }
   ServerError &error() {
     if (_xdr_field_number(discriminant_) == 3)
@@ -197,7 +197,7 @@ template<> struct xdr_traits<::Result> : xdr_traits_base {
 
   static constexpr const char *union_field_name(std::uint32_t which) {
     return which == 1 ? "val"
-      : which == 2 ? "key"
+      : which == 2 ? "keys"
       : "error";
   }
   static const char *union_field_name(const union_type &u) {
@@ -300,6 +300,50 @@ struct api_v1 {
     }
   };
 
+  struct get_t {
+    using interface_type = api_v1;
+    static constexpr std::uint32_t proc = 4;
+    static constexpr const char *proc_name = "get";
+    using arg_type = longstring;
+    using arg_wire_type = longstring;
+    using res_type = Result;
+    using res_wire_type = Result;
+    
+    template<typename C, typename...A> static auto
+    dispatch(C &&c, A &&...a) ->
+    decltype(c.get(std::forward<A>(a)...)) {
+      return c.get(std::forward<A>(a)...);
+    }
+    
+    template<typename C, typename DropIfVoid, typename...A> static auto
+    dispatch_dropvoid(C &&c, DropIfVoid &&d, A &&...a) ->
+    decltype(c.get(std::forward<DropIfVoid>(d), std::forward<A>(a)...)) {
+      return c.get(std::forward<DropIfVoid>(d), std::forward<A>(a)...);
+    }
+  };
+
+  struct list_t {
+    using interface_type = api_v1;
+    static constexpr std::uint32_t proc = 5;
+    static constexpr const char *proc_name = "list";
+    using arg_type = longstring;
+    using arg_wire_type = longstring;
+    using res_type = Result;
+    using res_wire_type = Result;
+    
+    template<typename C, typename...A> static auto
+    dispatch(C &&c, A &&...a) ->
+    decltype(c.list(std::forward<A>(a)...)) {
+      return c.list(std::forward<A>(a)...);
+    }
+    
+    template<typename C, typename DropIfVoid, typename...A> static auto
+    dispatch_dropvoid(C &&c, DropIfVoid &&d, A &&...a) ->
+    decltype(c.list(std::forward<DropIfVoid>(d), std::forward<A>(a)...)) {
+      return c.list(std::forward<DropIfVoid>(d), std::forward<A>(a)...);
+    }
+  };
+
   template<typename T, typename...A> static bool
   call_dispatch(T &&t, std::uint32_t proc, A &&...a) {
     switch(proc) {
@@ -311,6 +355,12 @@ struct api_v1 {
       return true;
     case 3:
       t.template dispatch<set_t>(std::forward<A>(a)...);
+      return true;
+    case 4:
+      t.template dispatch<get_t>(std::forward<A>(a)...);
+      return true;
+    case 5:
+      t.template dispatch<list_t>(std::forward<A>(a)...);
       return true;
     }
     return false;
@@ -335,6 +385,18 @@ struct api_v1 {
     set(_XDRARGS &&..._xdr_args) ->
     decltype(this->_XDRBASE::template invoke<set_t>(_xdr_args...)) {
       return this->_XDRBASE::template invoke<set_t>(_xdr_args...);
+    }
+
+    template<typename..._XDRARGS> auto
+    get(_XDRARGS &&..._xdr_args) ->
+    decltype(this->_XDRBASE::template invoke<get_t>(_xdr_args...)) {
+      return this->_XDRBASE::template invoke<get_t>(_xdr_args...);
+    }
+
+    template<typename..._XDRARGS> auto
+    list(_XDRARGS &&..._xdr_args) ->
+    decltype(this->_XDRBASE::template invoke<list_t>(_xdr_args...)) {
+      return this->_XDRBASE::template invoke<list_t>(_xdr_args...);
     }
   };
 };
