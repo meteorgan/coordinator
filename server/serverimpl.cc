@@ -116,8 +116,23 @@ std::unique_ptr<Result>
 api_v1_server::remove(std::unique_ptr<longstring> arg)
 {
 	std::unique_ptr<Result> res(new Result);
+	std::string& path = *arg;
 
-	// Fill in function body here
+	res->error() = ServerError::NONE;
+	if(db.hasKey(path)) {
+		if(db.list(path).size() == 0) {
+			db.remove(path);
+			std::cout << "remove key: " << path << std::endl;
+		}
+		else {
+			res->error() = ServerError::KEY_HAS_CHILDREN;
+			std::cout << "key has children, cannot remove." << std::endl;
+		}
+	}
+	else {
+		res->error() = ServerError::KEY_NOT_FOUND_ERROR;
+		std::cout << "key: " << path << " not found." << std::endl;
+	}
 
 	return res;
 }
@@ -125,6 +140,7 @@ api_v1_server::remove(std::unique_ptr<longstring> arg)
 std::unique_ptr<Result>
 api_v1_server::list(std::unique_ptr<longstring> arg) {
 	std::unique_ptr<Result> res(new Result);
+	std::string& path = *arg;
 
 	return res;
 }

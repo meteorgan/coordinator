@@ -106,8 +106,19 @@ Client::set(const std::string &path, const std::string &val)
 bool
 Client::remove(const std::string &path)
 {
-    // TODO: Fill me in
-    return false;
+	std::unique_ptr<Result> result = client->remove(path);
+	switch(result->error()) {
+	case ServerError::KEY_HAS_CHILDREN:
+		throw ClientException{ClientError::HAS_CHILDREN};
+		break;
+	case ServerError::KEY_NOT_FOUND_ERROR:
+		throw ClientException{ClientError::KEY_NOT_FOUND};
+		break;
+	default:
+		return true;
+	}
+
+	return false;
 }
 
 std::set<string>
