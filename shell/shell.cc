@@ -1,8 +1,12 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include <unistd.h>
+
+#include<readline/readline.h>
+#include<readline/history.h>
 
 #include <set>
 #include <string>
@@ -10,7 +14,6 @@
 #include <iostream>
 
 #include <xdrpp/srpc.h>
-
 #include <include/server.hh>
 #include <include/client.h>
 
@@ -141,7 +144,7 @@ Cmd_List(int argc, const char *argv[])
 void
 DispatchCommand(char *buf)
 {
-    int argc;
+    int argc = 0;
     char *argv[DEBUG_MAX_ARGS];
     char *nextArg;
 
@@ -186,16 +189,13 @@ DispatchCommand(char *buf)
 void
 Prompt()
 {
-    char buf[DEBUG_MAX_LINE];
     cout << "Client Shell" << endl;
+    char* line = NULL;
+    while ((line = readline("~> ")) != NULL) {
+        add_history(line);
 
-    while (cin.good()) {
-        cout << "> ";
-
-        // read input
-        cin.getline((char *)&buf, DEBUG_MAX_LINE);
-
-        DispatchCommand(buf);
+        DispatchCommand(line);
+        free(line);
     }
 }
 

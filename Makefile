@@ -11,10 +11,10 @@ XDRC = $(shell $(PKGCONFIG) --variable=xdrc xdrpp)
 
 CPPFLAGS := `$(PKGCONFIG) --cflags xdrpp` -I.
 LIBDIRS := -Llibclient
-LIBS := -lclient `$(PKGCONFIG) --libs xdrpp` -ldl
+LIBS := -lclient `$(PKGCONFIG) --libs xdrpp` -ldl -L/usr/local/opt/readline/lib -lreadline
 
 CFLAGS := -ggdb3 -O0 -pthread
-CXXFLAGS := -ggdb3 -O0 -pthread -std=c++11
+CXXFLAGS := -ggdb3 -O0 -pthread -std=c++11 -I/usr/local/opt/readline/include
 LDFLAGS := -g -pthread $(LIBDIRS)
 
 default: all
