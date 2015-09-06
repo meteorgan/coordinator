@@ -15,13 +15,12 @@ api_v1_server::api_v1_server() : db("kvstore.db") {
 
 static bool check_valid_path(const std::string& path) {
 	int length = path.length();
-	if((path[0] != '/') || ((path.size()) >1 && (path[length-1] == '/'))) {
+	if((path[0] != '/') || ((path.size()) > 1 && (path[length-1] == '/'))) {
 		return false;
 	}
 
 	for(char ch : path) {
-		if(!(ch == '/' || ch == '_' || (ch >= '0' && ch <= '9')
-			 || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')))
+		if(!(ch == '/' || ch == '_' || isalnum(ch)))
 			return false;
 	}
 
