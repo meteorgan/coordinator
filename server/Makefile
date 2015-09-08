@@ -16,9 +16,17 @@ server/%.o: server/%.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 # Generate initial files to be edited
-scaffold: include/server.x xdrpp
+server-scaffold: include/server.x xdrpp
+	mv server/serverimpl.hh server/serverimpl.hh-bak
+	mv server/serverimpl.cc server/serverimpl.cc-bak
 	$(XDRC) -serverhh -o server/serverimpl.hh $<
 	$(XDRC) -servercc -o server/serverimpl.cc $<
+
+participant-scaffold: include/participant.x xdrpp
+	mv server/participantimpl.hh server/participantimpl.hh-bak
+	mv server/participantimpl.cc server/participantimpl.cc-bak
+	$(XDRC) -serverhh -o server/participantimpl.hh $<
+	$(XDRC) -servercc -o server/participantimpl.cc $<
 
 server/server: $(SERVER_OBJ)
 	$(LD) -o $@ $(LDFLAGS) $(SERVER_OBJ) $(LIBS)

@@ -1,4 +1,4 @@
 
-// TODO: Modify the RPC Port to be unique
 #define UNIQUE_RPC_PORT     "6312"
+#define REPLICATOR_DEFAULT_PORT 6313
 

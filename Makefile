@@ -30,6 +30,9 @@ all: xdrpp include/server.hh libclient/libclient.a server/server shell/shell
 include/server.hh: include/server.x
 	$(XDRC) -hh -o include/server.hh $<
 
+include/participant.hh: include/participant.x
+	$(XDRC) -hh -o include/participant.hh $<
+
 xdrpp:
 	+git submodule update --init
 	cd xdrpp; test -f Makefile || ./configure CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)"
