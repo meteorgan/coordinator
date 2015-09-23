@@ -210,14 +210,15 @@ main(int argc, const char *argv[])
 {
 	client = Client();
 
-	if (argc != 2 && argc != 3) {
-		cout << "Usage: shell HOST [SCRIPT]" << endl;
+	if (argc != 3 && argc != 4) {
+		cout << "Usage: shell HOST PORT [SCRIPT]" << endl;
 		return 1;
 	}
 
+	int port = atoi(argv[2]);
 	// Setup connection
 	try {
-		client.open(argv[1]);
+		client.open(argv[1], port);
 	} catch (exception &e) {
 		cout << "Connection failed!" << endl;
 		cout << "Exception: " << e.what() << endl;
@@ -226,10 +227,10 @@ main(int argc, const char *argv[])
 
 	// Either execute script or prompt
 	try {
-		if (argc == 2) {
+		if (argc == 3) {
 			Prompt();
 		} else {
-			RunScript(argv[2]);
+			RunScript(argv[3]);
 		}
 	} catch(exception &e) {
 		cout << e.what() << endl;
@@ -238,4 +239,3 @@ main(int argc, const char *argv[])
 
 	return 0;
 }
-

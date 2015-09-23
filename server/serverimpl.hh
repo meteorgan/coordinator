@@ -21,8 +21,11 @@ public:
   std::unique_ptr<Result> get(std::unique_ptr<longstring> arg);
   std::unique_ptr<Result> list(std::unique_ptr<longstring> arg);
 
+  static void set(std::string &key, std::string &value);
+  static void remove(std::string &path);
+
 private:
-  ServerDB db;
+  static ServerDB db;
 };
 
 #endif // !__XDR_SERVER_SERVERIMPL_HH_INCLUDED__

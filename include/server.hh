@@ -41,6 +41,7 @@ enum ServerError : std::uint32_t {
   KEY_HAS_CHILDREN,
   KEY_MALFORMED,
   KEY_DUPLICATE,
+  QUORUM_NOT_REACHED,
 };
 namespace xdr {
 template<> struct xdr_traits<::ServerError>
@@ -61,6 +62,8 @@ template<> struct xdr_traits<::ServerError>
       return "KEY_MALFORMED";
     case ::KEY_DUPLICATE:
       return "KEY_DUPLICATE";
+    case ::QUORUM_NOT_REACHED:
+      return "QUORUM_NOT_REACHED";
     default:
       return nullptr;
     }

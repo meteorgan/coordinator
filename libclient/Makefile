@@ -9,4 +9,3 @@ libclient/%.o: libclient/%.cc
 
 libclient/libclient.a: $(LIBCLIENT_OBJ)
 	$(AR) -r $@ $(LIBCLIENT_OBJ)
-

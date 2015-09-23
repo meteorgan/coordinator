@@ -4,13 +4,30 @@
 #include<iostream>
 #include<set>
 
+#include<libconfig.h++>
+
 #include "server/serverimpl.hh"
+#include "include/rpcconfig.h"
+#include "xdrpp/socket.h"
+#include "xdrpp/srpc.h"
+#include "coordinator.h"
 
+ServerDB api_v1_server::db("kvstore.db");
 
-api_v1_server::api_v1_server() : db("kvstore.db") {
+api_v1_server::api_v1_server() {
 	if(!db.hasKey("/")) {
 		db.set("/", "");
 	}
+
+	libconfig::Config config;
+	config.readFile("server.cfg");
+	if(!config.exists("ip")) {
+		std::cerr << "do not have ip in server.cfg!" << std::endl;
+		exit(1);
+	}
+	std::string host = config.lookup("ip");
+	int port = COORDINATOR_DEFAULT_PORT;
+	config.lookupValue("coordinator_port", port);
 }
 
 static bool check_valid_path(const std::string& path) {
@@ -51,7 +68,6 @@ std::unique_ptr<Result>
 api_v1_server::create(std::unique_ptr<kvpair> arg)
 {
 	std::unique_ptr<Result> res(new Result(3));
-
 	std::string key = arg->key;
 	std::string value = arg->val;
 
@@ -63,11 +79,7 @@ api_v1_server::create(std::unique_ptr<kvpair> arg)
 			std::cerr << "duplicate key: " << key << std::endl;
 		}
 		else {
-			if(check_exist_parent(db, key)) {
-				db.set(key, value);
-				std::cout << "add key: " << key << " with value: " << value << std::endl;
-			}
-			else {
+			if(!check_exist_parent(db, key)) {
 				res->error() = ServerError::KEY_NO_PARENT;
 				std::cerr << "key: " << key << " has no parent!" << std::endl;
 			}
@@ -77,7 +89,17 @@ api_v1_server::create(std::unique_ptr<kvpair> arg)
 		res->error() = ServerError::KEY_MALFORMED;
 		std::cerr << "malformed key: "<< key << std::endl;
 	}
+	if(res->error() != ServerError::NONE) {
+		return res;
+	}
 
+	CommitRequest request;
+	request.kv.key = key;
+	request.kv.val = value;
+	request.opType = OpType::CREATE;
+	Result r = coordinator::getInstance().start_2pc(request);
+
+	*res = r;
 	return res;
 }
 
@@ -90,11 +112,7 @@ api_v1_server::set(std::unique_ptr<kvpair> arg)
 
 	res->error() = ServerError::NONE;
 	if(check_valid_path(key)) {
-		if(db.hasKey(key)) {
-			db.set(key, val);
-			std::cout << "set key: " << key << " with value: " << val << std::endl;
-		}
-		else {
+		if(!db.hasKey(key)) {
 			res->error() = ServerError::KEY_NOT_FOUND_ERROR;
 			std::cerr << "key: " << key << " not found." << std::endl;
 		}
@@ -103,8 +121,23 @@ api_v1_server::set(std::unique_ptr<kvpair> arg)
 		res->error() = ServerError::KEY_MALFORMED;
 		std::cerr << "malformed key: " << key << std::endl;
 	}
+	if(res->error() != ServerError::NONE) {
+		return res;
+	}
 
+	CommitRequest request;
+	request.kv.key = key;
+	request.kv.val = val;
+	request.opType = OpType::SET;
+	Result r = coordinator::getInstance().start_2pc(request);
+
+	*res = r;
 	return res;
+}
+
+void
+api_v1_server::set(std::string &key, std::string &value) {
+	db.set(key, value);
 }
 
 std::unique_ptr<Result>
@@ -142,11 +175,7 @@ api_v1_server::remove(std::unique_ptr<longstring> arg)
 	res->error() = ServerError::NONE;
 	if(check_valid_path(path)) {
 	if(db.hasKey(path)) {
-		if(db.list(path).size() == 0) {
-			db.remove(path);
-			std::cout << "remove key: " << path << std::endl;
-		}
-		else {
+		if(db.list(path).size() != 0) {
 			res->error() = ServerError::KEY_HAS_CHILDREN;
 			std::cout << "key has children, cannot remove." << std::endl;
 		}
@@ -160,8 +189,22 @@ api_v1_server::remove(std::unique_ptr<longstring> arg)
 		res->error() = ServerError::KEY_MALFORMED;
 		std::cerr << "malformed key: " << path << std::endl;
 	}
+	if(res->error() != ServerError::NONE) {
+		return res;
+	}
 
+	CommitRequest request;
+	request.kv.key = path;
+	request.opType = OpType::REMOVE;
+	Result r = coordinator::getInstance().start_2pc(request);
+
+	*res = r;
 	return res;
+}
+
+void
+api_v1_server::remove(std::string &path) {
+	db.remove(path);
 }
 
 static std::string getSubDir(const std::string parentPath, const std::string& path) {

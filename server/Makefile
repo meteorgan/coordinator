@@ -1,9 +1,12 @@
 
 SERVER_SRC := server/server.cc \
 			  server/serverimpl.cc \
+			  server/participant.cc \
 			  server/serverdb.cc \
 			  server/sqlstmt.cc \
-			  server/sqlite3.c
+			  server/sqlite3.c  \
+			  server/utils.cc  \
+			  server/coordinator.cc
 
 SERVER_OBJ := $(SERVER_SRC:.c=.o)
 SERVER_OBJ := $(SERVER_OBJ:.cc=.o)
@@ -23,10 +26,10 @@ server-scaffold: include/server.x xdrpp
 	$(XDRC) -servercc -o server/serverimpl.cc $<
 
 participant-scaffold: include/participant.x xdrpp
-	mv server/participantimpl.hh server/participantimpl.hh-bak
-	mv server/participantimpl.cc server/participantimpl.cc-bak
-	$(XDRC) -serverhh -o server/participantimpl.hh $<
-	$(XDRC) -servercc -o server/participantimpl.cc $<
+	mv server/participant.hh server/participant.hh-bak
+	mv server/participant.cc server/participant.cc-bak
+	$(XDRC) -serverhh -o server/participant.hh $<
+	$(XDRC) -servercc -o server/participant.cc $<
 
 server/server: $(SERVER_OBJ)
 	$(LD) -o $@ $(LDFLAGS) $(SERVER_OBJ) $(LIBS)

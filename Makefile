@@ -11,7 +11,7 @@ XDRC = $(shell $(PKGCONFIG) --variable=xdrc xdrpp)
 
 CPPFLAGS := `$(PKGCONFIG) --cflags xdrpp` -I.
 LIBDIRS := -Llibclient
-LIBS := -lclient `$(PKGCONFIG) --libs xdrpp` -ldl -L/usr/local/opt/readline/lib -lreadline
+LIBS := -lclient `$(PKGCONFIG) --libs xdrpp` -ldl -L/usr/local/opt/readline/lib -lreadline -lconfig++
 
 CFLAGS := -ggdb3 -O0 -pthread
 CXXFLAGS := -ggdb3 -O0 -pthread -std=c++11 -I/usr/local/opt/readline/include
@@ -29,6 +29,9 @@ all: xdrpp include/server.hh libclient/libclient.a server/server shell/shell
 
 include/server.hh: include/server.x
 	$(XDRC) -hh -o include/server.hh $<
+
+include/two_phrase_commit_common.hh: include/two_phrase_commit_common.x
+	$(XDRC) -hh -o include/two_phrase_commit_common.hh $<
 
 include/participant.hh: include/participant.x
 	$(XDRC) -hh -o include/participant.hh $<

@@ -28,14 +28,14 @@ Client::~Client()
 }
 
 void
-Client::open(const std::string &host)
+Client::open(const std::string &host, const int port)
 {
     if (isConnected()) {
         cout << "Already connected!" << endl;
         exit(1);
     }
 
-    auto fd = tcp_connect(host.c_str(), UNIQUE_RPC_PORT);
+    auto fd = tcp_connect(host.c_str(), std::to_string(port).c_str());
     client = new srpc_client<api_v1>{fd.release()};
 }
 
@@ -71,6 +71,9 @@ Client::create(const std::string &path, const std::string &val)
     	break;
     case ServerError::KEY_NO_PARENT:
     	throw ClientException{ClientError::NO_PARENT};
+    	break;
+    case ServerError::QUORUM_NOT_REACHED:
+    	throw ClientException{ClientError::QUORUM_NOT_REACHED_ERROR};
     	break;
     default:
     	return true;
@@ -111,6 +114,9 @@ Client::set(const std::string &path, const std::string &val)
     case ServerError::KEY_MALFORMED:
     	throw ClientException{ClientError::MALFORMED_KEY};
     	break;
+    case ServerError::QUORUM_NOT_REACHED:
+        throw ClientException{ClientError::QUORUM_NOT_REACHED_ERROR};
+        break;
     }
 }
 
@@ -127,6 +133,10 @@ Client::remove(const std::string &path)
 		break;
 	case ServerError::KEY_MALFORMED:
 		throw ClientException{ClientError::MALFORMED_KEY};
+		break;
+	case ServerError::QUORUM_NOT_REACHED:
+	    throw ClientException{ClientError::QUORUM_NOT_REACHED_ERROR};
+	    break;
 	default:
 		return true;
 	}

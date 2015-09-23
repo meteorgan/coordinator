@@ -6,6 +6,8 @@
 #include <string>
 #include <iostream>
 
+#include "include/rpcconfig.h"
+
 enum ClientError {
     /*
      * Set, Get or Remove failed because they key was not found.
@@ -27,6 +29,10 @@ enum ClientError {
 	 * they had persisted so can't set again
 	 */
 	DUPLICATE_KEY,
+	/*
+	 * not all replica agree to commit, retry please
+	 */
+	QUORUM_NOT_REACHED_ERROR,
 };
 
 /*
@@ -49,6 +55,8 @@ public:
                 return "MALFORMED KEY";
             case DUPLICATE_KEY:
             	return "DUPLICATE_KEY";
+            case QUORUM_NOT_REACHED_ERROR:
+            	return "SOME REPLICA NOT AGREE TO COMMIT, RETRY!";
         }
         return "UNKNOWN ERROR CODE";
     }
@@ -67,7 +75,7 @@ public:
     /*
      * Connect to a server
      */
-    void open(const std::string &host);
+    void open(const std::string &host, const int port = UNIQUE_RPC_PORT);
     /*
      * Disconnect from a server
      */

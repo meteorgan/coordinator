@@ -11,7 +11,8 @@ enum ServerError {
 	KEY_NO_PARENT,
 	KEY_HAS_CHILDREN,
 	KEY_MALFORMED,
-	KEY_DUPLICATE
+	KEY_DUPLICATE,
+	QUORUM_NOT_REACHED
 };
 
 union Result switch(unsigned discriminant) {
