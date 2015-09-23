@@ -24,7 +24,7 @@ participant_api_v1_server::participant_api_v1_server() {
 	int length = settings.getLength();
 	for(int i = 0; i < length; ++i) {
 		std::string host = "";
-		int port = COORDINATOR_DEFAULT_PORT;
+		int port = PARTICIPANT_DEFAULT_PORT;
 		if(!settings[i].lookupValue("host", host)) {
 			std::cerr << "do not have host in server.cfg!" << std::endl;
 			exit(1);

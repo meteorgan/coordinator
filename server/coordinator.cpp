@@ -42,7 +42,7 @@ coordinator::coordinator() {
 		std::cerr << "do not have ip in server.cfg!" << std::endl;
 	}
 	std::string host = config.lookup("ip");
-	int port = COORDINATOR_DEFAULT_PORT;
+	int port = PARTICIPANT_DEFAULT_PORT;
 	config.lookupValue("participant_port", port);
 	server = new participant_server(host, port);
 

@@ -1,6 +1,5 @@
 #include <unistd.h>
 #include <sys/socket.h>
-
 #include <iostream>
 #include <thread>
 
@@ -28,10 +27,7 @@ static void runListener(rpc_tcp_listener &listener) {
 int main(int argc, const char *argv[]) {
     libconfig::Config config;
     config.readFile("server.cfg");
-
-    int coordinator_port = COORDINATOR_DEFAULT_PORT;
     int participant_port = PARTICIPANT_DEFAULT_PORT;
-    config.lookupValue("coordinator_port", coordinator_port);
     config.lookupValue("participant_port", participant_port);
 
     participant_api_v1_server participant;
