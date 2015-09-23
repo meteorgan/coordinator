@@ -132,7 +132,7 @@ coordinator::response_vote(std::unique_ptr<ResponseInfo> arg) {
 		response_number++;
 		if(response == RequestResponse::VOTE_ABORT)
 			success = false;
-		request_variable.notify_one();
-
+		if(response_number == conns.size())
+			request_variable.notify_one();
 	}
 }

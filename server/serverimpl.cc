@@ -4,8 +4,6 @@
 #include<iostream>
 #include<set>
 
-#include<libconfig.h++>
-
 #include "server/serverimpl.hh"
 #include "include/rpcconfig.h"
 #include "xdrpp/socket.h"
@@ -18,16 +16,6 @@ api_v1_server::api_v1_server() {
 	if(!db.hasKey("/")) {
 		db.set("/", "");
 	}
-
-	libconfig::Config config;
-	config.readFile("server.cfg");
-	if(!config.exists("ip")) {
-		std::cerr << "do not have ip in server.cfg!" << std::endl;
-		exit(1);
-	}
-	std::string host = config.lookup("ip");
-	int port = COORDINATOR_DEFAULT_PORT;
-	config.lookupValue("coordinator_port", port);
 }
 
 static bool check_valid_path(const std::string& path) {
